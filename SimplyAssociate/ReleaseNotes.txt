@@ -1,0 +1,10 @@
+This tool is mainly for QA engineers who are writing test scripts in visual studio and TFS is used for test management.
+
+I, being a software tester, understand it is not quite as easy as one thinks about associating the test method with the test case in TFS. If there are more than 1000 test scripts then searching for a particular test method in "Choose Test" can be a painful even though test methods can be sorted.
+
+SimplyAssociate is visual studio extension targeting the test automation engineers and test engineers. This tool helps the QA team to map the test methods (the test script for a test case) with the test case in organization's TFS.
+
+With SimplyAssociate, QA can easily map test method with test case with 1 or 2 clicks in less time. Just right click on the test method and say "Associate with Test Case". If there more test methods in a single test class, then just right click outside the test method or on test class and say "Associate with Test Case". This will associate all test methods in test class with the respective test cases.
+
+How it works?
+The first and foremost thing, you must be connected to tfs and then only you can associate the test method with the test case in TFS. This tool looks for the test case by Id by using the WorkItem attribute specified for the test method. If a test method is missing the WorkItem attribute, then there will not be any association happening.

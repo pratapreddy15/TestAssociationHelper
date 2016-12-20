@@ -4,6 +4,9 @@
     <Identity Id="2524ce99-db9b-4907-aa04-6378e6bafa5e" Version="1.0" Language="en-US" Publisher="Microsoft" />
     <DisplayName>SimplyAssociate</DisplayName>
     <Description xml:space="preserve">SimplyAssociate is a visual studio extension that helps the test automation engineer to easily associate test method with the test case in TFS with minimum effort and lesser time.</Description>
+    <ReleaseNotes>ReleaseNotes.txt</ReleaseNotes>
+    <Icon>Resources\simplyassociate.png</Icon>
+    <PreviewImage>Resources\simplyassociate_preview.png</PreviewImage>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0]" />
