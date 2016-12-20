@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="Microsoft.SimplyAssociate.WinExistingTestAssoc"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="500"
+             Name="ExistingTestAssocWindow" Loaded="ExistingTestAssocWindow_Loaded">
+    <Grid>
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10, 0, 10, 0">
+                <Button Content="Clear List" Width="70" HorizontalAlignment="Left" Margin="0,10,0,10" Name="btnClearList" Click="btnClearList_Click" />
+                <Button Content="Start Loading" Width="90" Margin="10,10,0,10" Name="btnStart" Click="btnStart_Click" />
+                <TextBlock x:Name="txtLoadAssocations" Margin="10,10,0,10" HorizontalAlignment="Right" Height="20" Width="Auto" Text="No associations loaded" />
+            </StackPanel>
+            <DataGrid Name="dataGridExistingTestAssoc" BorderThickness="0" AutoGenerateColumns="False" Margin="10, 0, 10, 10" ScrollViewer.CanContentScroll="True"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ItemsSource="{Binding ExistingTestAssociations}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="TestCase Id" IsReadOnly="True"  Binding="{Binding TestCaseId}" Width="Auto" />
+                    <DataGridTextColumn Header="Automation Status" IsReadOnly="True"  Binding="{Binding AutomationStatus}" Width="Auto" />
+                    <DataGridTextColumn Header="Test Class" IsReadOnly="True"  Binding="{Binding TestClass}" Width="Auto" />
+                    <DataGridTextColumn Header="Test Method" IsReadOnly="True"  Binding="{Binding TestMethod}" Width="Auto" />
+                    <DataGridTextColumn Header="Automated Test Name" IsReadOnly="True"  Binding="{Binding AutomatedTestName}" Width="Auto" />
+                    <DataGridTextColumn Header="Automated Test Storage" IsReadOnly="True"  Binding="{Binding AutomatedTestStorage}" Width="Auto" />
+                    <DataGridTextColumn Header="Automated Test Type" IsReadOnly="True"  Binding="{Binding AutomatedTestType}" Width="Auto" />
+                    <DataGridTextColumn Header="Error Message" IsReadOnly="True"  />
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+    </Grid>
+</UserControl>
