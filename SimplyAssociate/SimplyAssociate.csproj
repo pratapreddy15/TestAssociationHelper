@@ -78,6 +78,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="PresentationCore" />
@@ -156,8 +157,11 @@
     <Compile Include="AppData\Queries.cs" />
     <Compile Include="AppData\TestImplementationFields.cs" />
     <Compile Include="ExistingTestAssocWindow.cs" />
+    <Compile Include="Utilities\AssemblyHelper.cs" />
+    <Compile Include="Utilities\AssemblyLoader.cs" />
     <Compile Include="Utilities\AssociationProgress.cs" />
     <Compile Include="Utilities\ExistingAssociationInfo.cs" />
+    <Compile Include="Utilities\NewTestAssociationInfo.cs" />
     <Compile Include="WinExistingTestAssoc.xaml.cs">
       <DependentUpon>WinExistingTestAssoc.xaml</DependentUpon>
     </Compile>

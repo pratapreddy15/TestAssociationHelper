@@ -1,4 +1,5 @@
-﻿using Microsoft.SimplyAssociate.Utilities;
+﻿using EnvDTE;
+using Microsoft.SimplyAssociate.Utilities;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -39,6 +40,7 @@ namespace Microsoft.SimplyAssociate
         ActiveSolution _activeSolution = null;
         MessageBox _msgBox = null;
         bool isCommandInitialized = false;
+        bool isBuildRunning = false;
 
         /// <summary>
         /// Default constructor of the package.
@@ -153,6 +155,7 @@ namespace Microsoft.SimplyAssociate
 
         private void AssociateTests(WinTestAssocResult winTestAssocationResult, TestClass testClass)
         {
+            
             Progress<AssociationProgress> progressOfAssociations = InitProgressForAssociatingTests(winTestAssocationResult);
             winTestAssocationResult.BeforeAssociatingTests(true);
             testClass.AssociateTestMethods(progressOfAssociations);
@@ -164,14 +167,6 @@ namespace Microsoft.SimplyAssociate
             winTestAssocationResult.BeforeAssociatingTests(true);
             testMethod.Associate(progressOfAssociations);
         }
-
-        //private void AssociateAllTests(WinTestAssocResult winTestAssocationResult, TestClass testClass)
-        //{
-        //    Progress<AssociationProgress> progressOfAssociations = null;
-        //    if (winTestAssocationResult != null)
-        //        progressOfAssociations = winTestAssocationResult.Progress;
-        //    testClass.AssociateTestMethods(progressOfAssociations);
-        //}
 
         #region Package Members
 
@@ -235,6 +230,8 @@ namespace Microsoft.SimplyAssociate
             Utilities.TestClass testClass = _activeSolution.ActiveTestClass;
             if (testClass == null)
                 _msgBox.ShowMessage("Unable to Read TetMethods", ErrorMessages.CURSOR_NOTINSIDE_TESTCLASS, MessageBox.MessageType.ERROR);
+            else if (isBuildRunning)
+                _msgBox.ShowMessage("Build in Progress", ErrorMessages.CANNOTSTART_TESTASSOCIATION_BUILD_INPROGRESS, MessageBox.MessageType.INFORMATION);
             else
             {
                 Microsoft.SimplyAssociate.Utilities.TestMethod testMethod = testClass.ActiveTestMethod;
@@ -242,12 +239,10 @@ namespace Microsoft.SimplyAssociate
                 WinTestAssocResult winTestAssociationResult = GetWindowInstance<AssociationResultWindow, WinTestAssocResult>();
                 if (testMethod == null) // Associate all test methods in current test class
                 {
-                    //AssociateAllTests(winTestAssociationResult, testClass);
                     AssociateTests(winTestAssociationResult, testClass);
                 }
                 else // Associate the specific test method
                 {
-                    //testMethod.Associate();
                     AssociateTests(winTestAssociationResult, testMethod);
                 }
             }
@@ -315,7 +310,29 @@ namespace Microsoft.SimplyAssociate
 
                 _activeSolution = new ActiveSolution(this);
                 isCommandInitialized = true;
+                this._activeSolution.VsAutomation.Events.BuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
+                this._activeSolution.VsAutomation.Events.BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
             }
+        }
+
+        void BuildEvents_OnBuildDone(vsBuildScope Scope, vsBuildAction Action)
+        {
+            isBuildRunning = false;
+            WinTestAssocResult.IsBuildRunning = false;
+        }
+
+        void BuildEvents_OnBuildBegin(vsBuildScope Scope, vsBuildAction Action)
+        {
+            if (TestAssociation.IsTestAssociationTaskRunning)
+            {
+                _msgBox.ShowMessage("Cannot Perform Action", ErrorMessages.CANNOTBUILD_TESTASSOCIATIONS_INPROGRESS, MessageBox.MessageType.INFORMATION);
+                this._activeSolution.VsAutomation.ExecuteCommand("Build.Cancel");
+                isBuildRunning = false;
+                WinTestAssocResult.IsBuildRunning = false;
+                return;
+            }
+            isBuildRunning = true;
+            WinTestAssocResult.IsBuildRunning = true;
         }
 
         private void InitializeCommandHelper()
@@ -358,6 +375,11 @@ namespace Microsoft.SimplyAssociate
 
                 isCommandInitialized = false;
                 CloseToolWindow();
+                this._activeSolution.VsAutomation.Events.BuildEvents.OnBuildBegin -= BuildEvents_OnBuildBegin;
+                TestAssociation.CancelLoadingOfExistingAssocations();
+                TestAssociation.CancelTestAssociations();
+                TestAssociation.ResetExistingTestAssocationsQueue();
+                TestAssociation.ResetTestAssociationsQueue();
             }
         }
 

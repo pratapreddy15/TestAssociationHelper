@@ -3,8 +3,10 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
 namespace Microsoft.SimplyAssociate.Utilities
@@ -16,15 +18,28 @@ namespace Microsoft.SimplyAssociate.Utilities
         static System.Threading.CancellationTokenSource tokenForExistingAssocationTask = new System.Threading.CancellationTokenSource();
         static System.Threading.CancellationTokenSource tokenForAssociateTestTask = new System.Threading.CancellationTokenSource();
 
-        internal static void AssociateTestMethod(AssociationInfo assocInfo, TestProject testProject, TestClass testClass)
+        internal static void AssociateTestMethod(AssemblyHelper assemblyHelper, AssociationInfo assocInfo, TestProject testProject, TestClass testClass)
         {
             if (TestManager.teamProject == null)
                 throw new ArgumentNullException(ErrorMessages.TEAMPROJECT_ISNULL);
 
-            string assemblyFullPath = testProject.OutputFilePath,
-                testProjectType = testProject.ProjectType,
-                testClassName = testClass.FullName;
+            if (tokenForAssociateTestTask.IsCancellationRequested)
+                return;
 
+            string assemblyFullPath, testProjectType, testClassName;
+
+            try
+            {
+                assemblyFullPath = testProject.OutputFilePath;
+                testProjectType = testProject.ProjectType;
+                testClassName = testClass.FullName;
+            }
+            catch (COMException)
+            {
+                return;
+            }
+
+            FileInfo assemblyFile = new FileInfo(assemblyFullPath);
             assocInfo.Status = AssociationStatus.ASSOCIATING;
             assocInfo.ImagePath = "";
             string tcId = assocInfo.TestCaseId;
@@ -53,22 +68,19 @@ namespace Microsoft.SimplyAssociate.Utilities
                         #region Association of test case with test method happens here
 
                         ITestCase tfsTestCase = tfsTestCases[0];
-                        Assembly testAssembly = Assembly.LoadFrom(assemblyFullPath);
-                        Type classType = testAssembly.GetType(testClassName, true);
-                        MethodInfo testMethod = classType.GetMethod(assocInfo.TestMethodName);
-                        string testMethodFullName = string.Concat(testMethod.DeclaringType.FullName, ".", testMethod.Name);
-                        byte[] bytesTestMethodFullName = System.Text.Encoding.Unicode.GetBytes(testMethodFullName);
-                        SHA256 cryptoService = SHA256CryptoServiceProvider.Create();
-                        byte[] hashedTestMethod = cryptoService.ComputeHash(bytesTestMethodFullName);
-                        byte[] generatedGuid = new byte[16]; // Byte array for GUID must be exactly 16 bytes long
-                        Array.Copy(hashedTestMethod, generatedGuid, 16);
-                        Guid guidOfTestMethod = new Guid(generatedGuid);
-
+                        //AssemblyHelper assemblyHelper = new AssemblyHelper();
+                        NewTestAssociationInfo testAssociationData = assemblyHelper.BuildTestImplementationData(
+                            assemblyFile.Directory.FullName,
+                            assemblyFile.FullName,
+                            testClassName,
+                            assocInfo.TestMethodName);
+                        if (testAssociationData == null)
+                            assocInfo.ErrorMessage = string.Format(ErrorMessages.NEW_TESTASSOCIATION_IS_NULL, assocInfo.TestMethodName, assocInfo.TestCaseId);
                         ITmiTestImplementation testImplementation = TestManager.teamProject.CreateTmiTestImplementation(
-                            testMethodFullName,
+                            testAssociationData.TestName,
                             testProjectType,
-                            testAssembly.GetName().Name,
-                            guidOfTestMethod);
+                            testAssociationData.Storage,
+                            testAssociationData.TestId);
                         try
                         {
                             tfsTestCase.WorkItem.Open();
@@ -168,6 +180,7 @@ namespace Microsoft.SimplyAssociate.Utilities
                     Status = AssociationStatus.INPROGRESS
                 };
                 progressOfAssociations.Report(assocProgress);
+                AssemblyHelper assemblyHelper = new AssemblyHelper("Domain_SimplyAssociate");
 
                 foreach (TestMethod testMethod in testMethods)
                 {
@@ -175,19 +188,27 @@ namespace Microsoft.SimplyAssociate.Utilities
                     {
                         assocProgress.Status = AssociationStatus.CANCELLED;
                         progressOfAssociations.Report(assocProgress);
+                        assemblyHelper.UnloadDomain();
+                        tokenForAssociateTestTask = null;
                         return;
                     }
                     AssociationInfo assocInfo = testMethod.AssocationInfo;
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    try
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
                             QueuedTestAssociations.Add(assocInfo);
                         });
-                    AssociateTestMethod(assocInfo, testMethod.TestClass.ParentTestProject, testMethod.TestClass);
+                    }
+                    catch (System.Threading.Tasks.TaskCanceledException) { }
+                    AssociateTestMethod(assemblyHelper, assocInfo, testMethod.TestClass.ParentTestProject, testMethod.TestClass);
                     assocProgress.CountOfProcessTests = ++countOfProcessedTests;
                     if (countOfProcessedTests == countOfTotalTests)
                         assocProgress.Status = AssociationStatus.COMPLETED;
                     progressOfAssociations.Report(assocProgress);
                 }
+                assemblyHelper.UnloadDomain();
+                tokenForAssociateTestTask = null;
             }, tokenForAssociateTestTask.Token);
         }
 
@@ -255,6 +276,18 @@ namespace Microsoft.SimplyAssociate.Utilities
         {
             if (tokenForAssociateTestTask != null)
                 tokenForAssociateTestTask.Cancel();
+        }
+
+        internal static bool IsTestAssociationTaskRunning
+        {
+            get
+            {
+                if (tokenForAssociateTestTask != null && tokenForAssociateTestTask.Token.IsCancellationRequested)
+                    return false;
+                else if (tokenForAssociateTestTask == null)
+                    return false;
+                return true;
+            }
         }
 
         internal static void ResetTestAssociationsQueue()

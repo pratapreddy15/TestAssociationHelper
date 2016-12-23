@@ -83,6 +83,12 @@ namespace Microsoft.SimplyAssociate
             }
         }
 
+        internal static bool IsBuildRunning
+        {
+            get;
+            set;
+        }
+
         internal static bool IsAssociationInProgress
         {
             get
@@ -96,6 +102,12 @@ namespace Microsoft.SimplyAssociate
             Button btn = sender as Button;
             if (btn.Content.ToString() == labelStartAssociating)
             {
+                if (IsBuildRunning)
+                {
+                    System.Windows.Forms.MessageBox.Show(ErrorMessages.CANNOTSTART_TESTASSOCIATION_BUILD_INPROGRESS, "Build in Progress", 
+                        System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                    return;
+                }
                 BeforeAssociatingTests(true);
                 ActiveTestClass.AssociateTestMethods(progress);
             }

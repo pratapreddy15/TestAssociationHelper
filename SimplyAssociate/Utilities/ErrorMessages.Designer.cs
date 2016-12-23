@@ -79,6 +79,24 @@ namespace Microsoft.SimplyAssociate.Utilities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot perform Build\Rebuild\Clean on Solution or Project because test associations are in progress. You must either stop the test associations or wait until all tests are associated..
+        /// </summary>
+        internal static string CANNOTBUILD_TESTASSOCIATIONS_INPROGRESS {
+            get {
+                return ResourceManager.GetString("CANNOTBUILD_TESTASSOCIATIONS_INPROGRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot start associating test(s) not because solution build is in progress. Please wait until the building of solution is completed..
+        /// </summary>
+        internal static string CANNOTSTART_TESTASSOCIATION_BUILD_INPROGRESS {
+            get {
+                return ResourceManager.GetString("CANNOTSTART_TESTASSOCIATION_BUILD_INPROGRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The test class has invalid attributes because it contains TestClass as well as CodedUITest. Please specify only one attribute for a single test class..
         /// </summary>
         internal static string CLASS_HAS_TESTCLASS_CODEDUITEST_ATTRIBUTES {
@@ -120,6 +138,15 @@ namespace Microsoft.SimplyAssociate.Utilities {
         internal static string ENVDTE_ISNULL {
             get {
                 return ResourceManager.GetString("ENVDTE_ISNULL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to build the test association data for associating test method {0} with test case having id {1}..
+        /// </summary>
+        internal static string NEW_TESTASSOCIATION_IS_NULL {
+            get {
+                return ResourceManager.GetString("NEW_TESTASSOCIATION_IS_NULL", resourceCulture);
             }
         }
         

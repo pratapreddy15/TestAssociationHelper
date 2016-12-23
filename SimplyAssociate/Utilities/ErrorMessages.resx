@@ -123,6 +123,12 @@
   <data name="ACTIVESOLUTION_NOTAVAILABLE" xml:space="preserve">
     <value>Unable to find the active\\opened solution or error might have occurred while opening the solution.</value>
   </data>
+  <data name="CANNOTBUILD_TESTASSOCIATIONS_INPROGRESS" xml:space="preserve">
+    <value>Cannot perform Build\Rebuild\Clean on Solution or Project because test associations are in progress. You must either stop the test associations or wait until all tests are associated.</value>
+  </data>
+  <data name="CANNOTSTART_TESTASSOCIATION_BUILD_INPROGRESS" xml:space="preserve">
+    <value>Cannot start associating test(s) not because solution build is in progress. Please wait until the building of solution is completed.</value>
+  </data>
   <data name="CLASS_HAS_TESTCLASS_CODEDUITEST_ATTRIBUTES" xml:space="preserve">
     <value>The test class has invalid attributes because it contains TestClass as well as CodedUITest. Please specify only one attribute for a single test class.</value>
   </data>
@@ -137,6 +143,9 @@
   </data>
   <data name="ENVDTE_ISNULL" xml:space="preserve">
     <value>The Visual Studio Core Automation wrapper [EnvDTE.DTE] is not initialized.</value>
+  </data>
+  <data name="NEW_TESTASSOCIATION_IS_NULL" xml:space="preserve">
+    <value>Unable to build the test association data for associating test method {0} with test case having id {1}.</value>
   </data>
   <data name="TEAMPROJECT_ISNULL" xml:space="preserve">
     <value>The Team Project is not initialized.</value>
