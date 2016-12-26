@@ -16,9 +16,19 @@ namespace Microsoft.SimplyAssociate.Utilities
         {
             this._solution = activeSolution;
             Projects _projects = this._solution.VsSolution.Projects;
-            _testProjects = new TestProject[_projects.Count];
-            for (int i = 0; i < _projects.Count; i++)
-                _testProjects[i] = InitTestProject(_projects.Item(i + 1));
+            InitTestProjectCollection(_projects);
+        }
+
+        private void InitTestProjectCollection(Projects childProjects)
+        {
+            List<TestProject> _projects = new List<TestProject>();
+            for (int i = 0; i < childProjects.Count; i++)
+            {
+                TestProject proj = InitTestProject(childProjects.Item(i + 1));
+                if (proj != null)
+                    _projects.Add(proj);
+            }
+            _testProjects = _projects.ToArray();   
         }
 
         private TestProject InitTestProject(EnvDTE.Project project)

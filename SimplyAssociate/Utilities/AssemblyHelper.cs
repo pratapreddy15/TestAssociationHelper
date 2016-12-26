@@ -33,24 +33,30 @@ namespace Microsoft.SimplyAssociate.Utilities
             Evidence evidence = new Evidence(parentDomain.Evidence);
             AppDomainSetup setUp = parentDomain.SetupInformation;
             simplyAssociateDomain = AppDomain.CreateDomain(domainName, evidence, setUp);
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-                {
-                    try
-                    {
-                        return Assembly.Load(args.Name);
-                    }
-                    catch { }
-                    string[] nameParts = args.Name.Split(',');
-                    string path = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
-                    path = Path.Combine(path, nameParts[0]);
-                    return Assembly.LoadFile(path);
-                };
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+        }
+
+        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            try
+            {
+                return Assembly.Load(args.Name);
+            }
+            catch { }
+            string[] nameParts = args.Name.Split(',');
+            string path = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+            path = Path.Combine(path, nameParts[0]);
+            return Assembly.LoadFile(path);
         }
 
         internal void UnloadDomain()
         {
             if (simplyAssociateDomain != null)
+            {
                 AppDomain.Unload(simplyAssociateDomain);
+                AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
+                simplyAssociateDomain = null;
+            }
         }
 
         internal NewTestAssociationInfo BuildTestImplementationData(string pathContainingAssemblies, string fullPathOfAssembly,

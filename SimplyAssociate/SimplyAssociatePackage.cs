@@ -40,6 +40,7 @@ namespace Microsoft.SimplyAssociate
         ActiveSolution _activeSolution = null;
         MessageBox _msgBox = null;
         bool isCommandInitialized = false;
+        bool canInitializeCommands = false;
         bool isBuildRunning = false;
 
         /// <summary>
@@ -155,7 +156,7 @@ namespace Microsoft.SimplyAssociate
 
         private void AssociateTests(WinTestAssocResult winTestAssocationResult, TestClass testClass)
         {
-            
+
             Progress<AssociationProgress> progressOfAssociations = InitProgressForAssociatingTests(winTestAssocationResult);
             winTestAssocationResult.BeforeAssociatingTests(true);
             testClass.AssociateTestMethods(progressOfAssociations);
@@ -177,6 +178,7 @@ namespace Microsoft.SimplyAssociate
         protected override void Initialize()
         {
             isCommandInitialized = false;
+            InitializeCommandHelper();
             InitializeCommands();
         }
 
@@ -280,6 +282,11 @@ namespace Microsoft.SimplyAssociate
         private void InitializeCommands()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+            if (canInitializeCommands == false)
+            {
+                Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Cannot initialize commands because either the opened solution does not contains test project or it is not available in TFS"));
+                return;
+            }
             base.Initialize();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
@@ -308,7 +315,6 @@ namespace Microsoft.SimplyAssociate
                 MenuCommand menuToolWinExistingTestAssocs = new MenuCommand(ShowToolWindow, toolwndExistingTestAssoc);
                 mcs.AddCommand(menuToolWinExistingTestAssocs);
 
-                _activeSolution = new ActiveSolution(this);
                 isCommandInitialized = true;
                 this._activeSolution.VsAutomation.Events.BuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
                 this._activeSolution.VsAutomation.Events.BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
@@ -337,8 +343,15 @@ namespace Microsoft.SimplyAssociate
 
         private void InitializeCommandHelper()
         {
+            _activeSolution = new ActiveSolution(this);
+            bool containsTestProject = _activeSolution.ContainsTestProject;
             _testManager = new TestManager(_activeSolution);
             _testManager.InitTeamProject();
+            bool isTfsProject = _testManager.IsTfsProject;
+            if (containsTestProject && isTfsProject)
+                canInitializeCommands = true;
+            else
+                return;
             _msgBox = new MessageBox(GetService(typeof(IVsUIShell)) as IVsUIShell);
         }
 
@@ -374,6 +387,7 @@ namespace Microsoft.SimplyAssociate
                     mcs.RemoveCommand(toolWindowViewExistingAssocs);
 
                 isCommandInitialized = false;
+                canInitializeCommands = false;
                 CloseToolWindow();
                 this._activeSolution.VsAutomation.Events.BuildEvents.OnBuildBegin -= BuildEvents_OnBuildBegin;
                 TestAssociation.CancelLoadingOfExistingAssocations();
@@ -385,9 +399,12 @@ namespace Microsoft.SimplyAssociate
 
         private void HandleSolutionOpenEvent()
         {
-            InitializeCommandHelper();
+            //InitializeCommandHelper();
             if (!isCommandInitialized)
+            {
+                InitializeCommandHelper();
                 InitializeCommands();
+            }
         }
 
         #endregion

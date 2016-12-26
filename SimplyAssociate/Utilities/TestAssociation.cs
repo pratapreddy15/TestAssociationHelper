@@ -68,7 +68,6 @@ namespace Microsoft.SimplyAssociate.Utilities
                         #region Association of test case with test method happens here
 
                         ITestCase tfsTestCase = tfsTestCases[0];
-                        //AssemblyHelper assemblyHelper = new AssemblyHelper();
                         NewTestAssociationInfo testAssociationData = assemblyHelper.BuildTestImplementationData(
                             assemblyFile.Directory.FullName,
                             assemblyFile.FullName,

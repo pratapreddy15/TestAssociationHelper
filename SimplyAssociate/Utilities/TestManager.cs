@@ -22,12 +22,30 @@ namespace Microsoft.SimplyAssociate.Utilities
             VersionControlExt vcExt = this._activeSolution.VsSolution.DTE.GetObject("Microsoft.VisualStudio.TeamFoundation.VersionControl.VersionControlExt") as VersionControlExt;
             string solutionDirectoryPath = this._activeSolution.ContainingFolder;
 
+            if (vcExt.SolutionWorkspace == null)
+            {
+                IsTfsProject = false;
+                return;
+            }
+
             TeamFoundation.VersionControl.Client.TeamProject _versionTeamProject = vcExt.SolutionWorkspace.GetTeamProjectForLocalPath(_activeSolution.FullName);
+
             if (_versionTeamProject == null)
-                throw new ArgumentNullException(string.Format(ErrorMessages.TEAMPROJECT_NOTFOUND_ATMAPPEDSOLUTION, solutionDirectoryPath));
+            {
+                IsTfsProject = false;
+                return;
+            }
+
+            IsTfsProject = true;
             string teamProjectName = _versionTeamProject.Name;
             ITestManagementService testManagementService = _versionTeamProject.TeamProjectCollection.GetService<ITestManagementService>();
             teamProject = testManagementService.GetTeamProject(teamProjectName);
+        }
+
+        internal bool IsTfsProject
+        {
+            get;
+            private set;
         }
     }
 }
