@@ -281,11 +281,11 @@ namespace Microsoft.SimplyAssociate.Utilities
         {
             get
             {
-                if (tokenForAssociateTestTask != null && tokenForAssociateTestTask.Token.IsCancellationRequested)
+                if (tokenForAssociateTestTask == null)
                     return false;
-                else if (tokenForAssociateTestTask == null)
-                    return false;
-                return true;
+                if (tokenForAssociateTestTask != null && tokenForAssociateTestTask.IsCancellationRequested)
+                    return true;
+                return false;
             }
         }
 
