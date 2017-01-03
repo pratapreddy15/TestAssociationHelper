@@ -15,8 +15,8 @@ namespace Microsoft.SimplyAssociate.Utilities
     {
         internal static ObservableCollection<AssociationInfo> QueuedTestAssociations = new ObservableCollection<AssociationInfo>();
         internal static ObservableCollection<ExistingAssociationInfo> ExistingTestAssociations = new ObservableCollection<ExistingAssociationInfo>();
-        static System.Threading.CancellationTokenSource tokenForExistingAssocationTask = new System.Threading.CancellationTokenSource();
-        static System.Threading.CancellationTokenSource tokenForAssociateTestTask = new System.Threading.CancellationTokenSource();
+        static System.Threading.CancellationTokenSource tokenForExistingAssocationTask = null;
+        static System.Threading.CancellationTokenSource tokenForAssociateTestTask = null;
 
         internal static void AssociateTestMethod(AssemblyHelper assemblyHelper, AssociationInfo assocInfo, TestProject testProject, TestClass testClass)
         {
@@ -283,9 +283,7 @@ namespace Microsoft.SimplyAssociate.Utilities
             {
                 if (tokenForAssociateTestTask == null)
                     return false;
-                if (tokenForAssociateTestTask != null && tokenForAssociateTestTask.IsCancellationRequested)
-                    return true;
-                return false;
+                return true;
             }
         }
 
