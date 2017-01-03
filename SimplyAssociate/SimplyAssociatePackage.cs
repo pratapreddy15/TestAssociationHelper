@@ -55,6 +55,8 @@ namespace Microsoft.SimplyAssociate
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
+        #region Private Methods
+
         /// <summary>
         /// This function is called when the user clicks the menu item that shows the 
         /// tool window. See the Initialize method to see how the menu item is associated to 
@@ -168,52 +170,6 @@ namespace Microsoft.SimplyAssociate
             winTestAssocationResult.BeforeAssociatingTests(true);
             testMethod.Associate(progressOfAssociations);
         }
-
-        #region Package Members
-
-        /// <summary>
-        /// Initialization of the package; this method is called right after the package is sited, so this is the place
-        /// where you can put all the initialization code that rely on services provided by VisualStudio.
-        /// </summary>
-        protected override void Initialize()
-        {
-            isCommandInitialized = false;
-            InitializeCommandHelper();
-            InitializeCommands();
-        }
-
-        void menuItem_BeforeQueryStatus(object sender, EventArgs e)
-        {
-            OleMenuCommand menucommand = sender as OleMenuCommand;
-            if (!_activeSolution.IsTestClassActive)
-            {
-                /* Do not show the menu command if user brings up the context menu outside of the test class 
-                 * or if the acitve document does not contain a test class */
-                menucommand.Visible = false;
-                return;
-            }
-            else if (menucommand.CommandID.ID == PkgCmdIDList.cmdViewAssociatedTest)
-            {
-                /* Disable the menu command if there is a task for associating the testmethod 
-                 * already running */
-                menucommand.Enabled = !WinExistingTestAssoc.IsLoadingInProgress;
-                return;
-            }
-            else if (menucommand.CommandID.ID == PkgCmdIDList.cmdAssociateWithTestCase)
-            {
-                /* Disable the menu command if there is a task for associating the testmethod 
-                 * already running */
-                menucommand.Enabled = !WinTestAssocResult.IsAssociationInProgress;
-                return;
-            }
-
-            // Show the menu command in the context menu
-            menucommand.Visible = true;
-        }
-
-        #endregion
-
-        #region Private Methods
 
         /// <summary>
         /// This function is the callback used to execute a command when the a menu item is clicked.
@@ -405,6 +361,48 @@ namespace Microsoft.SimplyAssociate
                 InitializeCommandHelper();
                 InitializeCommands();
             }
+        }
+
+        #endregion
+
+        #region Package Members
+
+        /// <summary>
+        /// Initialization of the package; this method is called right after the package is sited, so this is the place
+        /// where you can put all the initialization code that rely on services provided by VisualStudio.
+        /// </summary>
+        protected override void Initialize()
+        {
+            isCommandInitialized = false;
+            InitializeCommandHelper();
+            InitializeCommands();
+        }
+
+        void menuItem_BeforeQueryStatus(object sender, EventArgs e)
+        {
+            OleMenuCommand menucommand = sender as OleMenuCommand;
+            if (!_activeSolution.IsTestClassActive)
+            {
+                /* Do not show the menu command if user brings up the context menu outside of the test class 
+                 * or if the acitve document does not contain a test class */
+                menucommand.Visible = false;
+                return;
+            }
+            else if (menucommand.CommandID.ID == PkgCmdIDList.cmdViewAssociatedTest)
+            {
+                /* Disable the menu command if there is a task for associating the testmethod 
+                 * already running */
+                menucommand.Enabled = !WinExistingTestAssoc.IsLoadingInProgress;
+            }
+            else if (menucommand.CommandID.ID == PkgCmdIDList.cmdAssociateWithTestCase)
+            {
+                /* Disable the menu command if there is a task for associating the testmethod 
+                 * already running */
+                menucommand.Enabled = !WinTestAssocResult.IsAssociationInProgress;
+            }
+
+            // Show the menu command in the context menu
+            menucommand.Visible = true;
         }
 
         #endregion
