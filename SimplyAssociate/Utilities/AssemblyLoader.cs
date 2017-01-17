@@ -11,7 +11,7 @@ namespace Microsoft.SimplyAssociate.Utilities
 {
     public class AssemblyLoader : MarshalByRefObject
     {
-        public NewTestAssociationInfo GetNewTestAssociationData(string pathContainingAssemblies, string nameOfAssembly,
+        public NewTestAssociationInfo GetNewTestAssociationData(string pathContainingAssemblies, string nameOfAssemblyWithoutExtension,
             string nameOfTestClass, string nameOfTestMethod)
         {
             NewTestAssociationInfo newTestAssociationInfo = null;
@@ -30,7 +30,7 @@ namespace Microsoft.SimplyAssociate.Utilities
                 AppDomain.CurrentDomain.
                     ReflectionOnlyGetAssemblies().First();
 
-            if (reflectionOnlyAssembly.GetName().Name.Equals(nameOfAssembly, StringComparison.OrdinalIgnoreCase))
+            if (reflectionOnlyAssembly.GetName().Name.Equals(nameOfAssemblyWithoutExtension, StringComparison.OrdinalIgnoreCase))
             {
                 Type requiredType = reflectionOnlyAssembly.GetType(nameOfTestClass);
                 MethodInfo testMethod = requiredType.GetMethod(nameOfTestMethod);
@@ -42,10 +42,12 @@ namespace Microsoft.SimplyAssociate.Utilities
                 Array.Copy(hashedTestMethod, generatedGuid, 16);
                 Guid guidOfTestMethod = new Guid(generatedGuid);
 
+                FileInfo assemblyFileInfo = new FileInfo(requiredType.Assembly.Location);
+
                 newTestAssociationInfo = new NewTestAssociationInfo
                 {
                     TestName = testMethodFullName,
-                    Storage = requiredType.Assembly.GetName().Name,
+                    Storage = requiredType.Assembly.GetName().Name + assemblyFileInfo.Extension,
                     TestId = guidOfTestMethod
                 };
             }

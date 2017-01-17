@@ -129,7 +129,6 @@ namespace Microsoft.SimplyAssociate.Utilities
                 automationTestType = string.Empty;
             string[] testImplementation;
 
-            // Microsoft.TeamFoundation.TeamFoundationServiceUnavailableException
             IList<ITestCase> tfsTestCases = null;
             try
             {

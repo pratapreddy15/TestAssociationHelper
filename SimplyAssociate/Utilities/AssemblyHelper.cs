@@ -68,10 +68,10 @@ namespace Microsoft.SimplyAssociate.Utilities
                 return null;
             loader.LoadAssembly(fullPathOfAssembly);
             FileInfo assemblyFileInfo = new FileInfo(fullPathOfAssembly);
-            string justAssemblyName = assemblyFileInfo.Name.Replace(assemblyFileInfo.Extension, string.Empty);
+            string assemblyNameWithoutExtension = assemblyFileInfo.Name.Replace(assemblyFileInfo.Extension, string.Empty);
             testAssociationInfo = loader.GetNewTestAssociationData(
                 pathContainingAssemblies,
-                justAssemblyName,
+                assemblyNameWithoutExtension,
                 nameOfTestClass,
                 nameOfTestMethod);
 
