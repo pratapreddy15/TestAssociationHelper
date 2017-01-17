@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="2524ce99-db9b-4907-aa04-6378e6bafa5e" Version="1.3" Language="en-US" Publisher="Pratap Reddy" />
+    <Identity Id="2524ce99-db9b-4907-aa04-6378e6bafa5e" Version="1.4" Language="en-US" Publisher="Pratap Reddy" />
     <DisplayName>SimplyAssociate</DisplayName>
     <Description xml:space="preserve">SimplyAssociate is a visual studio extension that helps the test automation engineer to easily associate test method with the test case in TFS with minimum effort and lesser time.</Description>
     <ReleaseNotes>ReleaseNotes.txt</ReleaseNotes>
