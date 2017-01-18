@@ -36,7 +36,8 @@ namespace Microsoft.SimplyAssociate.Utilities
                 MethodInfo testMethod = requiredType.GetMethod(nameOfTestMethod);
                 string testMethodFullName = string.Concat(testMethod.DeclaringType.FullName, ".", testMethod.Name);
                 byte[] bytesTestMethodFullName = System.Text.Encoding.Unicode.GetBytes(testMethodFullName);
-                SHA256 cryptoService = SHA256CryptoServiceProvider.Create();
+                //SHA256 cryptoService = SHA256CryptoServiceProvider.Create();
+                SHA1 cryptoService = SHA1CryptoServiceProvider.Create();
                 byte[] hashedTestMethod = cryptoService.ComputeHash(bytesTestMethodFullName);
                 byte[] generatedGuid = new byte[16]; // Byte array for GUID must be exactly 16 bytes long
                 Array.Copy(hashedTestMethod, generatedGuid, 16);

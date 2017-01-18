@@ -78,7 +78,7 @@ namespace Microsoft.SimplyAssociate.Utilities
                         ITmiTestImplementation testImplementation = TestManager.teamProject.CreateTmiTestImplementation(
                             testAssociationData.TestName,
                             testProjectType,
-                            testAssociationData.Storage,
+                            testAssociationData.Storage.ToLower(),
                             testAssociationData.TestId);
                         try
                         {

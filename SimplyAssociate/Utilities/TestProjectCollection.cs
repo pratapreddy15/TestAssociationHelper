@@ -28,7 +28,7 @@ namespace Microsoft.SimplyAssociate.Utilities
                 if (proj != null)
                     _projects.Add(proj);
             }
-            _testProjects = _projects.ToArray();   
+            _testProjects = _projects.ToArray();
         }
 
         private TestProject InitTestProject(EnvDTE.Project project)
@@ -49,7 +49,7 @@ namespace Microsoft.SimplyAssociate.Utilities
                 Name = projectName,
                 FullName = projectFullName,
                 ContainingFolder = projectFullName.TrimEnd(projectName.ToCharArray()),
-                ProjectType = projectType,
+                ProjectType = (projectType == "UnitTest" ? "Unit Test" : projectType),
                 ParentSolution = this._solution
             };
         }
